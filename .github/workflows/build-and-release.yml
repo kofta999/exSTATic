@@ -2,11 +2,11 @@ name: Build and Release Extension
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version tag (optional - will auto-generate if not provided)'
+        description: "Version tag (optional - will auto-generate if not provided)"
         required: false
         type: string
 
@@ -15,84 +15,84 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
 
-    - name: Install dependencies
-      run: npm i
+      - name: Install dependencies
+        run: npm i
 
-    - name: Build extension
-      run: npm run build
+      - name: Build extension
+        run: npm run build:prod
 
-    - name: Get version from manifest
-      id: get_version
-      run: |
-        VERSION=$(node -pe "require('./manifest-chrome.json').version")
-        echo "version=v$VERSION" >> $GITHUB_OUTPUT
-        echo "Extension version: $VERSION"
+      - name: Get version from manifest
+        id: get_version
+        run: |
+          VERSION=$(node -pe "require('./manifest-chrome.json').version")
+          echo "version=v$VERSION" >> $GITHUB_OUTPUT
+          echo "Extension version: $VERSION"
 
-    - name: Use manual version if provided
-      if: github.event.inputs.version != ''
-      run: |
-        echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+      - name: Use manual version if provided
+        if: github.event.inputs.version != ''
+        run: |
+          echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
 
-    - name: Create Chrome extension zip
-      run: |
-        cd build-chrome
-        zip -r ../exSTATic-chrome-${{ steps.get_version.outputs.version }}.zip .
-        cd ..
+      - name: Create Chrome extension zip
+        run: |
+          cd build-chrome
+          zip -r ../exSTATic-chrome-${{ steps.get_version.outputs.version }}.zip .
+          cd ..
 
-    - name: Create Firefox extension zip
-      run: |
-        cd build-firefox
-        zip -r ../exSTATic-firefox-${{ steps.get_version.outputs.version }}.zip .
-        cd ..
+      - name: Create Firefox extension zip
+        run: |
+          cd build-firefox
+          zip -r ../exSTATic-firefox-${{ steps.get_version.outputs.version }}.zip .
+          cd ..
 
-    - name: Generate release notes
-      id: release_notes
-      run: |
-        cat > release_notes.md << 'EOF'
-        ## exSTATic Extension Release ${{ steps.get_version.outputs.version }}
+      - name: Generate release notes
+        id: release_notes
+        run: |
+          cat > release_notes.md << 'EOF'
+          ## exSTATic Extension Release ${{ steps.get_version.outputs.version }}
 
-        ### Downloads
-        - **Chrome**: `exSTATic-chrome-${{ steps.get_version.outputs.version }}.zip`
-        - **Firefox**: `exSTATic-firefox-${{ steps.get_version.outputs.version }}.zip`
+          ### Downloads
+          - **Chrome**: `exSTATic-chrome-${{ steps.get_version.outputs.version }}.zip`
+          - **Firefox**: `exSTATic-firefox-${{ steps.get_version.outputs.version }}.zip`
 
-        ### Installation
-        #### Chrome/Edge
-        1. Download the Chrome zip file
-        2. Extract it to a folder
-        3. Open Chrome and go to `chrome://extensions/`
-        4. Enable "Developer mode"
-        5. Click "Load unpacked" and select the extracted folder
+          ### Installation
+          #### Chrome/Edge
+          1. Download the Chrome zip file
+          2. Extract it to a folder
+          3. Open Chrome and go to `chrome://extensions/`
+          4. Enable "Developer mode"
+          5. Click "Load unpacked" and select the extracted folder
 
-        #### Firefox
-        1. Download the Firefox zip file
-        2. Open Firefox and go to `about:debugging`
-        3. Click "This Firefox"
-        4. Click "Load Temporary Add-on"
-        5. Select the zip file
+          #### Firefox
+          1. Download the Firefox zip file
+          2. Open Firefox and go to `about:debugging`
+          3. Click "This Firefox"
+          4. Click "Load Temporary Add-on"
+          5. Select the zip file
 
-        ### Changes
-        Built from commit: ${{ github.sha }}
-        EOF
+          ### Changes
+          Built from commit: ${{ github.sha }}
+          EOF
 
-    - name: Create Release
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: ${{ steps.get_version.outputs.version }}
-        name: exSTATic ${{ steps.get_version.outputs.version }}
-        body_path: release_notes.md
-        files: |
-          exSTATic-chrome-${{ steps.get_version.outputs.version }}.zip
-          exSTATic-firefox-${{ steps.get_version.outputs.version }}.zip
-        draft: false
-        prerelease: false
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.get_version.outputs.version }}
+          name: exSTATic ${{ steps.get_version.outputs.version }}
+          body_path: release_notes.md
+          files: |
+            exSTATic-chrome-${{ steps.get_version.outputs.version }}.zip
+            exSTATic-firefox-${{ steps.get_version.outputs.version }}.zip
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

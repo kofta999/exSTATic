@@ -56,19 +56,39 @@ const options = {
   ],
   mainFields: ["svelte", "browser", "module", "main"],
   bundle: true,
-  minify: false,
+  minify: true,
   target: ["chrome118", "firefox118"],
   plugins: [sveltePlugin({ preprocess: sveltePreprocess({ postcss: true }) })],
 };
 
-const context_chrome =
-  !buildChrome ||
-  (await esbuild.context({ ...options, outdir: build_chrome_dir }));
-const context_firefox =
-  !buildFirefox ||
-  (await esbuild.context({ ...options, outdir: build_firefox_dir }));
-await Promise.all([
-  !buildChrome || context_chrome.watch(),
-  !buildFirefox || context_firefox.watch(),
-]);
-// await Promise.all([!buildChrome || context_chrome.dispose(), !buildFirefox || context_firefox.dispose()])
+try {
+  console.log("Starting production build...");
+
+  const builds = [];
+
+  if (buildChrome) {
+    console.log("Building Chrome extension...");
+    builds.push(esbuild.build({ ...options, outdir: build_chrome_dir }));
+  }
+
+  if (buildFirefox) {
+    console.log("Building Firefox extension...");
+    builds.push(esbuild.build({ ...options, outdir: build_firefox_dir }));
+  }
+
+  await Promise.all(builds);
+
+  console.log("Production build completed successfully!");
+
+  // Log build output info
+  if (buildChrome) {
+    console.log(`Chrome build output: ${build_chrome_dir}/`);
+  }
+  if (buildFirefox) {
+    console.log(`Firefox build output: ${build_firefox_dir}/`);
+  }
+
+} catch (error) {
+  console.error("Build failed:", error);
+  process.exit(1);
+}

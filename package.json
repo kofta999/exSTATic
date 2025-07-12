@@ -1,6 +1,7 @@
 {
   "scripts": {
     "build": "node esbuild.mjs",
+    "build:prod": "node esbuild.prod.mjs",
     "web-ext-chrome": "web-ext --source-dir build-chrome --artifacts-dir web-ext-chrome",
     "web-ext-firefox": "web-ext --source-dir build-firefox --artifacts-dir web-ext-firefox",
     "format": "npx prettier --write src"
