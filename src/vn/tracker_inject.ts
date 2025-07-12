@@ -1,4 +1,5 @@
 console.log("Injected");
+console.log("Kofta999's fork with Tadoku support");
 
 import * as browser from "webextension-polyfill";
 import { VNStorage } from "./vn_storage";
