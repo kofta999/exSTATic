@@ -25,7 +25,7 @@ const setup = async () => {
       if (timeRead) {
         const delta = timeRead - (prevTime || timeRead);
         console.log({ delta, timeRead, prevTime });
-        tadoku.send(delta, data["process_path"]);
+        tadoku.send(delta, data["original_process_path"]);
         prevTime = timeRead;
       }
     });
