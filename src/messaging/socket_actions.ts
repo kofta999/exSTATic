@@ -70,6 +70,7 @@ export async function dataFetched(event: MessageEvent) {
   await port?.postMessage({
     line: line,
     process_path: process_path,
+    original_process_path: data["process_path"],
     date: date,
     time: time,
   });
