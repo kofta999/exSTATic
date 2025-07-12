@@ -67,8 +67,8 @@ const context_chrome =
 const context_firefox =
   !buildFirefox ||
   (await esbuild.context({ ...options, outdir: build_firefox_dir }));
-await Promise.all([
-  !buildChrome || context_chrome.watch(),
-  !buildFirefox || context_firefox.watch(),
-]);
-// await Promise.all([!buildChrome || context_chrome.dispose(), !buildFirefox || context_firefox.dispose()])
+// await Promise.all([
+//   !buildChrome || context_chrome.watch(),
+//   !buildFirefox || context_firefox.watch(),
+// ]);
+await Promise.all([!buildChrome || context_chrome.dispose(), !buildFirefox || context_firefox.dispose()])
