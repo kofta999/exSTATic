@@ -95,9 +95,9 @@ export class VNStorage extends MediaStorage {
       }
 
       date_stats[date].lines_read =
-        date_stat.lines_read ?? 0 + lineSplitCount(line);
+        date_stat?.lines_read ?? 0 + lineSplitCount(line);
       date_stats[date].chars_read =
-        date_stat.chars_read ?? 0 + charsInLine(line);
+        date_stat?.chars_read ?? 0 + charsInLine(line);
     });
 
     await this.instance_storage?.deleteLines(
