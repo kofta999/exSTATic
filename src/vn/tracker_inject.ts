@@ -11,12 +11,13 @@ const setup = async () => {
   const vn_storage = await VNStorage.build(true);
   const tadoku = new Tadoku();
 
+  let prevTime = vn_storage.instance_storage?.today_stats?.time_read;
+
   let port;
   const connectMessaging = () => {
     port = browser.runtime.connect({ name: "vn_lines" });
     port.onDisconnect.addListener(connectMessaging);
-
-    let prevTime = vn_storage.instance_storage?.today_stats?.time_read;
+    // console.log('init connect')
 
     port.onMessage.addListener(async (data) => {
       await vn_storage.changeInstance(undefined, data["process_path"]);
@@ -25,7 +26,7 @@ const setup = async () => {
       const timeRead = vn_storage.instance_storage?.today_stats.time_read;
       if (timeRead) {
         const delta = timeRead - (prevTime || timeRead);
-        console.log({ delta, timeRead, prevTime });
+        // console.log({ delta, timeRead, prevTime });
         tadoku.send(delta, data["original_process_path"]);
         prevTime = timeRead;
       }
